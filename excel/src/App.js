@@ -1,10 +1,10 @@
 import './App.css';
-import DataGridDemo from './components/DataGridDemo.jsx';
+import Grid from './components/Grid.jsx';
 
 function App() {
   return (
     <div className="App">
-      <DataGridDemo/>
+      <Grid/>
     </div>
   );
 }
