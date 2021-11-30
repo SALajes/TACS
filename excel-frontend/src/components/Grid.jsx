@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { sendCellData } from '../routes/updateCell';
+import { COL_TO_ASCII, ASCII_TO_COL } from '../lib/ascii';
 
 const NUM_COLS = 20
 const NUM_LINES = 20
-const A_ASCII_CODE = 65
 
-function colHeader(id) {
-    if (id < 26)
-        return String.fromCharCode(A_ASCII_CODE + id)
-    else return String.fromCharCode(A_ASCII_CODE + id / 26 - 1, A_ASCII_CODE + id%26)
+function onCellChangeHandler(params) {
+    sendCellData(params.id - 1, ASCII_TO_COL(params.field), params.value)
 }
 
 let columns = [
@@ -22,7 +21,7 @@ let columns = [
 
 for (let i = 0; i < NUM_COLS; i++) {
     columns.push({
-        field: colHeader(i),
+        field: COL_TO_ASCII(i),
         width: 75,
         editable: true,
         sortable: false,
@@ -62,6 +61,8 @@ export default function Grid() {
                 disableColumnSelector
                 disableColumnMenu
                 disableExtendRowFullWidth
+                autoHeight
+                onCellEditCommit={onCellChangeHandler}
             />
         </div>
     );
