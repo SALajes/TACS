@@ -7,4 +7,6 @@ export default class Cell {
         this.line = line
         this.column = column
     }
+
+    view():string {return ''}
 }

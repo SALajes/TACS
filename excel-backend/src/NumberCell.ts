@@ -8,4 +8,8 @@ export default class NumberCell extends Cell{
         this.isEmpty = false
         this.num = num
     }
+
+    view():string {
+        return this.num.toString()
+    }
 }

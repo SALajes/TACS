@@ -8,4 +8,8 @@ export default class StringCell extends Cell {
         this.isEmpty = false
         this.str = str
     }
+
+    view(): string {
+        return this.str
+    }
 }
