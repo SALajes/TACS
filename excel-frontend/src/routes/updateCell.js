@@ -1,13 +1,11 @@
-function sendCellData(line, column, value) {
+async function sendCellData(line, column, value) {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ line: line, column: column, value: value })
     };
-    fetch('http://localhost:8080/updateCell', requestOptions)
-        .then(response => {
-            console.log(response.status)
-        })
+    return fetch('http://localhost:8080/updateCell', requestOptions)
+        .then(response => response.json())
 }
 
 module.exports = { sendCellData }

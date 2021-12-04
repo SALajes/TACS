@@ -12,4 +12,8 @@ export default class NumberCell extends Cell{
     view():string {
         return this.num.toString()
     }
+
+    content(): string {
+        return this.num.toString()
+    }
 }

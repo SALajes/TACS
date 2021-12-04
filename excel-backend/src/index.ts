@@ -3,6 +3,7 @@ import cors from "cors";
 import Cell from "./Cell";
 import NumberCell from "./NumberCell";
 import StringCell from "./StringCell";
+import FormulaCell from "./FormulaCell";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -17,7 +18,10 @@ function cellFactory(line: number, column: number, value: string): Cell {
         return new Cell(line, column)
     if (!isNaN(Number(value)))
         return new NumberCell(line, column, Number(value))
-    else return new StringCell(line, column, value)
+    if (value[0] === '=') {
+        return new FormulaCell(line, column, value)
+    }
+    return new StringCell(line, column, value)
 }
 
 function updateCellMatrix(updatedCell:Cell) {
@@ -47,12 +51,33 @@ app.get("/all", (_req, res) => {
     })
 });
 
+app.get("/getCell", (req, res) => {
+    var cell:Cell = cells.find((elem) => {
+        return elem.line.toString() === req.query.line
+        && elem.column.toString() === req.query.column
+    })
+
+    var result:string
+
+    if (cell === undefined) result = ''
+    else result = cell.content()
+
+    res.status(200).json({
+        line: req.query.line,
+        column: req.query.column,
+        value: result
+    })
+});
+
 app.post("/updateCell", (req, res) => {
-    // console.log(req.body)
-    const updatedCell:Cell = cellFactory(req.body.line, req.body.column, req.body.value)
+    const updatedCell:Cell = cellFactory(req.body.line, req.body.column, req.body.value.trim())
     updateCellMatrix(updatedCell)
-    // console.log(cells)
-    res.sendStatus(200);
+
+    res.status(200).json({
+        line: req.body.line,
+        column: req.body.column,
+        value: updatedCell.view()
+    })
 });
 
 // start the Express server

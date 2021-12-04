@@ -12,4 +12,8 @@ export default class StringCell extends Cell {
     view(): string {
         return this.str
     }
+
+    content(): string {
+        return this.str
+    }
 }

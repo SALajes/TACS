@@ -9,4 +9,6 @@ export default class Cell {
     }
 
     view():string {return ''}
+
+    content():string {return ''}
 }
