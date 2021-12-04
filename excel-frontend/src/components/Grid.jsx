@@ -1,29 +1,18 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { sendCellData } from '../routes/updateCell';
 import { getCellData } from '../routes/getCell';
 import { getAllCells } from '../routes/getAllCells';
+import { deleteAllData } from '../routes/deleteAll';
 import { COL_TO_ASCII, ASCII_TO_COL } from '../lib/ascii';
 
 const NUM_COLS = 20
 const NUM_LINES = 20
 const COL_WIDTH = 100
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
 
 class Grid extends React.Component {
 
@@ -42,8 +31,8 @@ class Grid extends React.Component {
             rows: [],
             editing: false,
             value: '',
-            line: 0,
-            column: 0
+            line: -1,
+            column: -1
         }
 
         for (let i = 0; i < NUM_COLS; i++) {
@@ -57,22 +46,12 @@ class Grid extends React.Component {
 
         for (let i = 0; i < NUM_LINES; i++) {
             this.state.rows.push({
-                id: i + 1,
-                A: '',
-                B: '',
-                C: '',
-                D: '',
-                E: '',
-                F: '',
-                G: '',
-                H: '',
-                I: '',
-                J: '',
+                id: i + 1
             })
         }
     }
 
-    getCells() {
+    componentDidMount() {
         getAllCells()
             .then(cells => {
                 var newRows = [...this.state.rows]
@@ -83,23 +62,32 @@ class Grid extends React.Component {
             })
             .catch()
     }
-
-    componentDidMount() {
-        this.getCells()
-    }
-
-    handleOpen = () => {
-        this.setState({ editing: true})
-    }
-
-    handleClose = () => { this.setState({ editing: false, value: '' }) }
     
-    handleSubmit = () => {
+    onButtonClickHandler = () => {
         sendCellData(this.state.line, this.state.column, this.state.value)
             .then(cell => {
                 var newRows = [...this.state.rows]
                 newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.value
-                this.setState({ rows: newRows, editing: false, value: "" })
+                this.setState({ rows: newRows, editing: false, value: '' })
+            })
+    }
+
+    onDeleteClickHandler = () => {
+        deleteAllData()
+            .then(() => {
+                var newRows = []
+                for (let i = 0; i < NUM_LINES; i++) {
+                    newRows.push({
+                        id: i + 1
+                    })
+                }
+                this.setState({
+                    rows: newRows,
+                    editing: false,
+                    value: '',
+                    line: -1,
+                    column: -1
+                })
             })
     }
 
@@ -109,18 +97,61 @@ class Grid extends React.Component {
         this.setState({ value: e.target.value})
     }
 
-    onCellEditStartHandler = params => {
-        this.setState({ line: params.id - 1, column: ASCII_TO_COL(params.field)})
+    onCellClickHandler = params => {
+        this.setState({ editing: false })
         getCellData(params.id - 1, ASCII_TO_COL(params.field))
             .then(cell => {
-                this.setState({ value: cell.value})
-                })
-            .then(this.handleOpen())
+                this.setState({ line: params.id - 1, column: ASCII_TO_COL(params.field), value: cell.value })
+            })
+    }
+
+    onCellDoubleClickHandler = () => {
+        this.setState({ editing: true})
     }
 
     render() {        
         return (
             <div style={{ height: '100%', width: '100%'}}>
+                <div style={{ height: '100%', width: '98%', margin:'auto', display:'flex' }}>
+                    <div style={{ height: '100%', width: '5%', margin: 'auto' }}>
+                        <IconButton
+                            aria-label="delete"
+                            onClick={this.onDeleteClickHandler}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </div>
+                    <div style={{ height: '100%', width: '5%', margin: '0% 1%'}}>
+                        <TextField
+                            id="outlined-singleline-static"
+                            variant='outlined'
+                            margin='dense'
+                            disabled
+                            value={this.state.line !== -1 ? `${COL_TO_ASCII(this.state.column)}${this.state.line+1}` : ""}
+                        />
+                    </div>
+                    <div style={{ height: '100%', width: '80%', margin: '0% auto' }}>
+                        <TextField
+                            id="outlined-multiline-static"
+                            multiline
+                            variant={this.state.editing ? 'outlined' : 'filled'}
+                            rows={1}
+                            margin='dense'
+                            fullWidth
+                            value={this.state.value}
+                            disabled={!this.state.editing}
+                            onChange={this.onTextFieldChange}
+                        />
+                    </div>
+                    <div style={{ height: '100%', width: '10%', margin: '1%' }}>
+                        <Button
+                            onClick={this.onButtonClickHandler}
+                            variant="outlined"
+                            size="large"
+                            fullWidth
+                        >OK</Button>
+                    </div>
+                </div>                
                 <DataGrid
                     rows={this.state.rows}
                     columns={this.columns}
@@ -135,27 +166,9 @@ class Grid extends React.Component {
                     disableColumnMenu
                     disableExtendRowFullWidth
                     autoHeight
-                    onCellDoubleClick={this.onCellEditStartHandler}
+                    onCellClick={this.onCellClickHandler}
+                    onCellDoubleClick={this.onCellDoubleClickHandler}
                 />
-                <Modal
-                    open={this.state.editing}
-                    onClose={this.handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                    hideBackdrop
-                >
-                    <Box sx={style}>
-                        <TextField
-                            id="outlined-multiline-static"
-                            multiline
-                            rows={10}
-                            value={this.state.value}
-                            fullWidth
-                            onChange={this.onTextFieldChange}
-                        />
-                        <Button onClick={this.handleSubmit}>Submit</Button>
-                    </Box>
-                </Modal>
             </div>
         );
     }

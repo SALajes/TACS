@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/all", (_req, res) => {
-    let result:Object[] = new Array()
+    const result:object[] = new Array()
     for (const cell of cells) {
         result.push({
             line: cell.line,
@@ -52,12 +52,12 @@ app.get("/all", (_req, res) => {
 });
 
 app.get("/getCell", (req, res) => {
-    var cell:Cell = cells.find((elem) => {
+    const cell:Cell = cells.find((elem) => {
         return elem.line.toString() === req.query.line
         && elem.column.toString() === req.query.column
     })
 
-    var result:string
+    let result:string
 
     if (cell === undefined) result = ''
     else result = cell.content()
@@ -79,6 +79,10 @@ app.post("/updateCell", (req, res) => {
         value: updatedCell.view()
     })
 });
+
+app.delete("/deleteAll", () => {
+    cells.length = 0
+})
 
 // start the Express server
 app.listen(port, () => {
