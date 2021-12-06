@@ -6,6 +6,7 @@ async function sendCellData(line, column, value) {
     };
     return fetch('http://localhost:8080/updateCell', requestOptions)
         .then(response => response.json())
+        .then(response => response.cells)
 }
 
 module.exports = { sendCellData }

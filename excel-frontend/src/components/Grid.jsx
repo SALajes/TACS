@@ -65,11 +65,15 @@ class Grid extends React.Component {
     
     onButtonClickHandler = () => {
         sendCellData(this.state.line, this.state.column, this.state.value)
-            .then(cell => {
+            .then(cells => {
+                console.log(cells)
                 var newRows = [...this.state.rows]
-                newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.value
+                for (var cell of cells) {
+                    newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.value
+                }
                 this.setState({ rows: newRows, editing: false, value: '' })
             })
+            .catch()
     }
 
     onDeleteClickHandler = () => {
