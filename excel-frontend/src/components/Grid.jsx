@@ -98,6 +98,7 @@ class Grid extends React.Component {
     }
 
     onCellClickHandler = params => {
+        if (params.field === 'id') return
         this.setState({ editing: false })
         getCellData(params.id - 1, ASCII_TO_COL(params.field))
             .then(cell => {
@@ -105,7 +106,8 @@ class Grid extends React.Component {
             })
     }
 
-    onCellDoubleClickHandler = () => {
+    onCellDoubleClickHandler = params => {
+        if (params.field === 'id') return
         this.setState({ editing: true})
     }
 
