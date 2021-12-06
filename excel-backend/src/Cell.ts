@@ -13,8 +13,8 @@ export default class Cell {
 
     updateDependencies(dependents: FormulaCell[]) {
         this.dependents = dependents
-        for (let dependent of this.dependents) {
-            for (var i = 0; i < dependent.dependencies.length; i++) {
+        for (const dependent of this.dependents) {
+            for (let i = 0; i < dependent.dependencies.length; i++) {
                 if (dependent.dependencies[i].line === this.line
                     && dependent.dependencies[i].column === this.column) {
                     dependent.dependencies.splice(i,1)
