@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { Lang } from "./Language";
 import Cell from "./Cell";
 import NumberCell from "./NumberCell";
 import StringCell from "./StringCell";
@@ -14,6 +15,7 @@ app.use(express.json());
 const cells:Cell[] = new Array()
 
 function cellFactory(line: number, column: number, value: string): Cell {
+    console.log(Lang.Statement.parse(value))
     if (value === '')
         return new Cell(line, column)
     if (!isNaN(Number(value)))
