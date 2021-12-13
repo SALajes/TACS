@@ -1,11 +1,10 @@
 import express from "express";
 import cors from "cors";
-import { Lang } from "./Language";
-import Cell from "./Cell";
-import NumberCell from "./NumberCell";
-import StringCell from "./StringCell";
-import FormulaCell from "./FormulaCell";
-import ErrorCell from "./ErrorCell";
+import { Lang } from "./language/Language";
+import Cell from "./cells/Cell";
+import FormulaCell from "./cells/formulas/FormulaCell";
+import EmptyCell from "./cells/EmptyCell";
+import ErrorCell from "./cells/ErrorCell";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -18,7 +17,7 @@ const cells:Cell[] = new Array<Cell>()
 function cellFactory(line: number, column: number, value: string): Cell {
     let cell:Cell;
     if (value === '') {
-        cell = new Cell()
+        cell = new EmptyCell()
     } else {
         const parse = Lang.Statement.parse(value)
         if (parse.status)
@@ -26,18 +25,19 @@ function cellFactory(line: number, column: number, value: string): Cell {
         else cell = new ErrorCell(value)
     }
     cell.setCoords(line, column)
-    cell.analyse(cells)
+    if (cell instanceof FormulaCell)
+        cell.analyseDependencies(cells)
     return cell
 }
 
 function updateCellMatrix(updatedCell:Cell) {
     for (let i:number = 0; i < cells.length; i++)
         if (cells[i].line === updatedCell.line && cells[i].column === updatedCell.column) {
-            updatedCell.updateDependencies(cells[i].dependents)
+            updatedCell.updateDependents(cells[i].dependents)
             cells.splice(i,1)
             break
         }
-    if (!updatedCell.isEmpty)
+    if (!(updatedCell instanceof EmptyCell))
         cells.push(updatedCell)
 }
 

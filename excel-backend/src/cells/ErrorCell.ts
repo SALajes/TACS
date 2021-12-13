@@ -5,7 +5,6 @@ export default class ErrorCell extends Cell {
 
     constructor(str: string) {
         super()
-        this.isEmpty = false
         this.str = str
     }
 

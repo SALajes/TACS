@@ -5,7 +5,6 @@ export default class NumberCell extends Cell{
 
     constructor(num: number) {
         super()
-        this.isEmpty = false
         this.num = num
     }
 

@@ -7,6 +7,7 @@ export function COL_TO_ASCII(id: number) {
 }
 
 export function ASCII_TO_COL(str: string) {
+    str = str.toUpperCase()
     if (str.length === 1) {
         return str.charCodeAt(0) - A_ASCII_CODE
     } else return (str.charCodeAt(0) - A_ASCII_CODE + 1 ) * 26 + str.charCodeAt(1) - A_ASCII_CODE

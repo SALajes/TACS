@@ -1,8 +1,10 @@
 import * as Parsimmon from 'parsimmon'
-import Cell from './Cell';
-import FormulaCell from './FormulaCell';
-import NumberCell from './NumberCell';
-import StringCell from './StringCell';
+import ReferenceCell from '../cells/formulas/ReferenceCell';
+import Cell from '../cells/Cell';
+import FormulaCell from '../cells/formulas/FormulaCell';
+import NumberCell from '../cells/NumberCell';
+import StringCell from '../cells/StringCell';
+import { ASCII_TO_COL } from '../utils/ascii';
 
 // type Grammar = {
 //     Statement: Cell,
@@ -73,7 +75,7 @@ import StringCell from './StringCell';
 type Grammar = {
     Statement: Cell,
     Formula: FormulaCell,
-    CellReference: string,
+    CellReference: [string, string],
     Value: NumberCell | StringCell,
     Number: NumberCell,
     String: StringCell
@@ -84,10 +86,10 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     Formula: r => Parsimmon.seq(
         Parsimmon.regex(/=/),
         Parsimmon.alt(
-            r.CellReference.map(i => new FormulaCell("="+i))
+            r.CellReference.map(i => new ReferenceCell(`=${i[0]}${i[1]}`, Number(i[1]) - 1, ASCII_TO_COL(i[0])))
         )
     ).map(i => i[1]),
-    CellReference: _ => Parsimmon.seq(Parsimmon.letters, Parsimmon.digits).map(i => i[0] + '\'' + i[1]),
+    CellReference: _ => Parsimmon.seq(Parsimmon.letters, Parsimmon.digits).map(i => [i[0].toUpperCase(),i[1]]),
     Value: r => Parsimmon.alt(r.Number, r.String),
     Number: _ => Parsimmon.alt(
         Parsimmon.regexp(/[0-9]+(\.[0-9]+)?/),

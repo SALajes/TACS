@@ -1,7 +1,6 @@
-import FormulaCell from "./FormulaCell"
+import FormulaCell from "./formulas/FormulaCell"
 
-export default class Cell {
-    isEmpty:boolean = true
+export default abstract class Cell {
     line: number
     column: number
     dependents: FormulaCell[] = Array<FormulaCell>()
@@ -11,7 +10,7 @@ export default class Cell {
         this.column = column
     }
 
-    updateDependencies(dependents: FormulaCell[]) {
+    updateDependents(dependents: FormulaCell[]) {
         this.dependents = dependents
         for (const dependent of this.dependents) {
             for (let i = 0; i < dependent.dependencies.length; i++) {
@@ -25,11 +24,7 @@ export default class Cell {
         }
     }
 
-    analyse(cells: Cell[]) {
-        console.log("Make this method abstract")
-    }
+    abstract view():string
 
-    view():string {return ''}
-
-    content():string {return ''}
+    abstract content():string
 }

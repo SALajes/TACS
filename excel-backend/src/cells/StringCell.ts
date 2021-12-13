@@ -5,7 +5,6 @@ export default class StringCell extends Cell {
 
     constructor(str: string) {
         super()
-        this.isEmpty = false
         this.str = str
     }
 
