@@ -86,7 +86,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     Formula: r => Parsimmon.seq(
         Parsimmon.regex(/=/),
         Parsimmon.alt(
-            r.CellReference.map(i => new ReferenceCell(`=${i[0]}${i[1]}`, Number(i[1]) - 1, ASCII_TO_COL(i[0])))
+            r.CellReference.map(i => new ReferenceCell(`=${i[0]}${i[1]}`, [Number(i[1]) - 1, ASCII_TO_COL(i[0])]))
         )
     ).map(i => i[1]),
     CellReference: _ => Parsimmon.seq(Parsimmon.letters, Parsimmon.digits).map(i => [i[0].toUpperCase(),i[1]]),

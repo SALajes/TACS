@@ -2,18 +2,16 @@ import Cell from "../Cell"
 import FormulaCell from "./FormulaCell"
 
 export default class ReferenceCell extends FormulaCell {
-    referenceLine: number
-    referenceColumn: number
+    reference: [number, number]
 
-    constructor(formula: string, referenceLine: number, referenceColumn: number) {
+    constructor(formula: string, reference: [number, number]) {
         super(formula)
         this.formula = formula
-        this.referenceLine = referenceLine
-        this.referenceColumn = referenceColumn
+        this.reference = reference
     }
 
     analyseDependencies(cells: Cell[]): void {
-        this.analyseDependency(cells, [[this.referenceLine, this.referenceColumn]])
+        this.analyseDependency(cells, [this.reference])
     }
 
     view(): string {
