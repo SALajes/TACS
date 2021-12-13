@@ -5,11 +5,10 @@ export default class FormulaCell extends Cell {
     formula: string
     dependencies: Cell[] = new Array<Cell>()
 
-    constructor(line: number, column: number, formula: string, cells: Cell[]) {
-        super(line, column)
+    constructor(formula: string) {
+        super()
         this.isEmpty = false
         this.formula = formula
-        this.analyse(cells)
     }
 
     analyse(cells: Cell[]): void {

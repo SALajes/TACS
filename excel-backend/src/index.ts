@@ -5,6 +5,7 @@ import Cell from "./Cell";
 import NumberCell from "./NumberCell";
 import StringCell from "./StringCell";
 import FormulaCell from "./FormulaCell";
+import ErrorCell from "./ErrorCell";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -15,15 +16,18 @@ app.use(express.json());
 const cells:Cell[] = new Array<Cell>()
 
 function cellFactory(line: number, column: number, value: string): Cell {
-    console.log(Lang.Statement.parse(value))
-    if (value === '')
-        return new Cell(line, column)
-    if (!isNaN(Number(value)))
-        return new NumberCell(line, column, Number(value))
-    if (value[0] === '=') {
-        return new FormulaCell(line, column, value, cells)
+    let cell:Cell;
+    if (value === '') {
+        cell = new Cell()
+    } else {
+        const parse = Lang.Statement.parse(value)
+        if (parse.status)
+            cell = parse.value
+        else cell = new ErrorCell(value)
     }
-    return new StringCell(line, column, value)
+    cell.setCoords(line, column)
+    cell.analyse(cells)
+    return cell
 }
 
 function updateCellMatrix(updatedCell:Cell) {

@@ -6,7 +6,7 @@ export default class Cell {
     column: number
     dependents: FormulaCell[] = Array<FormulaCell>()
 
-    constructor(line: number, column: number) {
+    setCoords(line: number, column: number) {
         this.line = line
         this.column = column
     }
@@ -23,6 +23,10 @@ export default class Cell {
                 }
             }
         }
+    }
+
+    analyse(cells: Cell[]) {
+        console.log("Make this method abstract")
     }
 
     view():string {return ''}

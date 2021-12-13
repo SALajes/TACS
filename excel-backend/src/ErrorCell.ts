@@ -1,6 +1,6 @@
 import Cell from "./Cell"
 
-export default class StringCell extends Cell {
+export default class ErrorCell extends Cell {
     str: string
 
     constructor(str: string) {
@@ -10,7 +10,7 @@ export default class StringCell extends Cell {
     }
 
     view(): string {
-        return this.str
+        return `Error: ${this.str}`
     }
 
     content(): string {
