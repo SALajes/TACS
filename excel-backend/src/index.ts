@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import Cell from "./cells/Cell";
 import { cellFactory, cells, findCell, updateCellMatrix } from "./cells/cellsManager";
-import FormulaCell from "./cells/formulas/FormulaCell";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -51,7 +50,7 @@ app.get("/getCell", (req, res) => {
 app.post("/updateCell", (req, res) => {
     const updatedCell:Cell = cellFactory(req.body.line, req.body.column, req.body.value.trim())
     updateCellMatrix(updatedCell)
-    console.log(cells)
+    // console.log(cells)
 
     const result: object[] = new Array<object>()
     result.push({

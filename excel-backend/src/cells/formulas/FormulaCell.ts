@@ -1,4 +1,5 @@
 import Cell from "../Cell"
+import { findCell } from "../cellsManager"
 import EmptyCell from "../EmptyCell"
 import ErrorCell from "../ErrorCell"
 
@@ -20,23 +21,25 @@ export default abstract class FormulaCell extends Cell {
                 this.hasException = true
                 continue
             }
-            let foundReference: boolean = false
-            for (const cell of cells) {
-                if (cell.line === reference[0] && cell.column === reference[1]) {
-                    this.dependencies.push(cell)
-                    cell.addDependent(this)
-                    foundReference = true
-                    break
+
+            const referenceCell = findCell(cells, reference[0], reference[1])
+            if (referenceCell !== undefined) {
+                const allDependents = this.getAllDependents()
+                if (findCell(allDependents, referenceCell) !== undefined) {
+                    this.hasException = true
+                    this.formula = ''
+                    continue
                 }
+                this.dependencies.push(referenceCell)
+                referenceCell.addDependent(this)
+                continue
             }
-            if (foundReference) continue
-            else {
-                const cell: Cell = new EmptyCell()
-                cell.setCoords(reference[0], reference[1])
-                this.dependencies.push(cell)
-                cell.addDependent(this)
-                cells.push(cell)
-            }
+
+            const cell: Cell = new EmptyCell()
+            cell.setCoords(reference[0], reference[1])
+            this.dependencies.push(cell)
+            cell.addDependent(this)
+            cells.push(cell)
         }
     }
 
@@ -54,7 +57,7 @@ export default abstract class FormulaCell extends Cell {
 
     view(): string {
         if (this.hasException)
-            return "!Formula can't reference itself!"
+            return "!Circular dependence found!"
         for (const dependency of this.dependencies)
             if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException))
                 return "!Formula references a cell with an error"

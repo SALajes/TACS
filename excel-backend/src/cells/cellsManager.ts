@@ -52,7 +52,7 @@ export function findCell(cellArray: Cell[], lineOrCell: number | string | Cell, 
         return cellArray.find((elem) => { return elem.line.toString() === lineOrCell && elem.column.toString() === column })
     if (lineOrCell instanceof Cell)
         return cellArray.find((elem) => { return elem.line === lineOrCell.line && elem.column === lineOrCell.column })
-    return null
+    return undefined
 }
 
 function removeRemovableCells(): void {
