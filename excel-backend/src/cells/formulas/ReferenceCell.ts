@@ -15,6 +15,8 @@ export default class ReferenceCell extends FormulaCell {
     }
 
     view(): string {
+        if (this.dependencies.length === 0)
+            return ''
         return this.dependencies[0].view()
     }
 }

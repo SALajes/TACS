@@ -1,10 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { Lang } from "./language/Language";
 import Cell from "./cells/Cell";
-import FormulaCell from "./cells/formulas/FormulaCell";
-import EmptyCell from "./cells/EmptyCell";
-import ErrorCell from "./cells/ErrorCell";
+import { cellFactory, cells, findCell, updateCellMatrix } from "./cells/cellsManager";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -12,37 +9,8 @@ const port = 8080; // default port to listen
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
 
-const cells:Cell[] = new Array<Cell>()
-
-function cellFactory(line: number, column: number, value: string): Cell {
-    let cell:Cell;
-    if (value === '') {
-        cell = new EmptyCell()
-    } else {
-        const parse = Lang.Statement.parse(value)
-        if (parse.status)
-            cell = parse.value
-        else cell = new ErrorCell(value)
-    }
-    cell.setCoords(line, column)
-    if (cell instanceof FormulaCell)
-        cell.analyseDependencies(cells)
-    return cell
-}
-
-function updateCellMatrix(updatedCell:Cell) {
-    for (let i:number = 0; i < cells.length; i++)
-        if (cells[i].line === updatedCell.line && cells[i].column === updatedCell.column) {
-            updatedCell.updateDependents(cells[i].dependents)
-            cells.splice(i,1)
-            break
-        }
-    if (!(updatedCell instanceof EmptyCell))
-        cells.push(updatedCell)
-}
-
 // define a route handler for the default home page
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
     res.send("Backend Online!");
 });
 
@@ -52,7 +20,7 @@ app.get("/all", (_req, res) => {
         result.push({
             line: cell.line,
             column: cell.column,
-            value: cell.view()
+            view: cell.view()
         })
     }
     res.status(200).json({
@@ -61,40 +29,44 @@ app.get("/all", (_req, res) => {
 });
 
 app.get("/getCell", (req, res) => {
-    const cell:Cell = cells.find((elem) => {
-        return elem.line.toString() === req.query.line
-        && elem.column.toString() === req.query.column
-    })
+    const cell: Cell = findCell(cells, String(req.query.line), String(req.query.column))
 
-    let result:string
+    let content: string
+    let view: string
 
-    if (cell === undefined) result = ''
-    else result = cell.content()
+    if (cell === undefined) {
+        content = ''
+        view = ''
+    }
+    else {
+        content = cell.content()
+        view = cell.view()
+    }
 
     res.status(200).json({
         line: req.query.line,
         column: req.query.column,
-        value: result
+        content,
+        view
     })
 });
 
 app.post("/updateCell", (req, res) => {
     const updatedCell:Cell = cellFactory(req.body.line, req.body.column, req.body.value.trim())
     updateCellMatrix(updatedCell)
-    // console.log(cells)
-    // console.log(updatedCell.dependents)
+    console.log(cells)
 
     const result: object[] = new Array<object>()
     result.push({
         line: updatedCell.line,
         column: updatedCell.column,
-        value: updatedCell.view()
+        view: updatedCell.view()
     })
     for (const cell of updatedCell.dependents) {
         result.push({
             line: cell.line,
             column: cell.column,
-            value: cell.view()
+            view: cell.view()
         })
     }
     res.status(200).json({

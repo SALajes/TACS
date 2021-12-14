@@ -30,7 +30,8 @@ class Grid extends React.Component {
         this.state = {
             rows: [],
             editing: false,
-            value: '',
+            content: '',
+            view: '',
             line: -1,
             column: -1
         }
@@ -56,7 +57,7 @@ class Grid extends React.Component {
             .then(cells => {
                 var newRows = [...this.state.rows]
                 for (var cell of cells) {
-                    newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.value
+                    newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.view
                 }
                 this.setState({ rows: newRows })
             })
@@ -64,16 +65,18 @@ class Grid extends React.Component {
     }
     
     onButtonClickHandler = () => {
-        sendCellData(this.state.line, this.state.column, this.state.value)
+        sendCellData(this.state.line, this.state.column, this.state.content)
             .then(cells => {
-                console.log(cells)
                 var newRows = [...this.state.rows]
                 for (var cell of cells) {
-                    newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.value
+                    newRows[cell.line][COL_TO_ASCII(cell.column)] = cell.view
                 }
-                this.setState({ rows: newRows, editing: false, value: '' })
+                this.setState({ rows: newRows, editing: false })
+                getCellData(this.state.line, this.state.column)
+                    .then(cell => {
+                        this.setState({ content: cell.content, view: cell.view })
+                    })
             })
-            .catch()
     }
 
     onDeleteClickHandler = () => {
@@ -88,7 +91,8 @@ class Grid extends React.Component {
                 this.setState({
                     rows: newRows,
                     editing: false,
-                    value: '',
+                    content: '',
+                    view: '',
                     line: -1,
                     column: -1
                 })
@@ -98,7 +102,7 @@ class Grid extends React.Component {
     onTextFieldChange = (e) => {
         if (e.target.value === '')
             e.target.value = " "
-        this.setState({ value: e.target.value})
+        this.setState({ content: e.target.value})
     }
 
     onCellClickHandler = params => {
@@ -106,7 +110,7 @@ class Grid extends React.Component {
         this.setState({ editing: false })
         getCellData(params.id - 1, ASCII_TO_COL(params.field))
             .then(cell => {
-                this.setState({ line: params.id - 1, column: ASCII_TO_COL(params.field), value: cell.value })
+                this.setState({ line: params.id - 1, column: ASCII_TO_COL(params.field), content: cell.content, view: cell.view })
             })
     }
 
@@ -127,29 +131,36 @@ class Grid extends React.Component {
                             <DeleteIcon />
                         </IconButton>
                     </div>
-                    <div style={{ height: '100%', width: '5%', margin: '0% 1%'}}>
+                    <div style={{ height: '100%', width: '5%', margin: 'auto 1%'}}>
                         <TextField
-                            id="outlined-singleline-static"
                             variant='outlined'
                             margin='dense'
                             disabled
                             value={this.state.line !== -1 ? `${COL_TO_ASCII(this.state.column)}${this.state.line+1}` : ""}
                         />
                     </div>
-                    <div style={{ height: '100%', width: '80%', margin: '0% auto' }}>
+                    <div style={{ height: '100%', width: '70%', margin: '0% auto' }}>
                         <TextField
-                            id="outlined-multiline-static"
                             multiline
                             variant={this.state.editing ? 'outlined' : 'filled'}
                             rows={1}
                             margin='dense'
                             fullWidth
-                            value={this.state.value}
+                            value={this.state.content}
                             disabled={!this.state.editing}
                             onChange={this.onTextFieldChange}
                         />
+                        <TextField
+                            multiline
+                            variant='filled'
+                            rows={1}
+                            margin='dense'
+                            fullWidth
+                            value={this.state.view}
+                            disabled
+                        />
                     </div>
-                    <div style={{ height: '100%', width: '10%', margin: '1%' }}>
+                    <div style={{ height: '100%', width: '10%', margin: 'auto 1%' }}>
                         <Button
                             onClick={this.onButtonClickHandler}
                             variant="outlined"
