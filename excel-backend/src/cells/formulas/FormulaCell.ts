@@ -1,5 +1,6 @@
 import Cell from "../Cell"
 import EmptyCell from "../EmptyCell"
+import ErrorCell from "../ErrorCell"
 
 export default abstract class FormulaCell extends Cell {
     formula: string
@@ -45,6 +46,8 @@ export default abstract class FormulaCell extends Cell {
         this.dependencies = new Array<Cell>()
     }
 
+    abstract calculateValue(): string
+
     content(): string {
         return this.formula
     }
@@ -52,6 +55,9 @@ export default abstract class FormulaCell extends Cell {
     view(): string {
         if (this.hasException)
             return "!Formula can't reference itself!"
-        return this.dependencies[0].view()
+        for (const dependency of this.dependencies)
+            if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException))
+                return "!Formula references a cell with an error"
+        return this.calculateValue()
     }
 }

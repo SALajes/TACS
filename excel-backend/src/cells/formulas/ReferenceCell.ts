@@ -14,7 +14,7 @@ export default class ReferenceCell extends FormulaCell {
         this.analyseDependency(cells, [this.reference])
     }
 
-    view(): string {
+    calculateValue(): string {
         if (this.dependencies.length === 0)
             return ''
         return this.dependencies[0].view()

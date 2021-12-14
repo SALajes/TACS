@@ -38,6 +38,17 @@ export default abstract class Cell {
             }
     }
 
+    getAllDependents(): Cell[] {
+        const result = new Array<Cell>()
+        for (const dependent of this.dependents) {
+            result.push(dependent)
+            dependent.getAllDependents().forEach((elem) => {
+                if (findCell(result,elem) === undefined) result.push(elem)
+            })
+        }
+        return result
+    }
+
     abstract view(): string
 
     abstract content(): string

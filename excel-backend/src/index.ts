@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import Cell from "./cells/Cell";
 import { cellFactory, cells, findCell, updateCellMatrix } from "./cells/cellsManager";
+import FormulaCell from "./cells/formulas/FormulaCell";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -31,14 +32,10 @@ app.get("/all", (_req, res) => {
 app.get("/getCell", (req, res) => {
     const cell: Cell = findCell(cells, String(req.query.line), String(req.query.column))
 
-    let content: string
-    let view: string
+    let content: string = ''
+    let view: string = ''
 
-    if (cell === undefined) {
-        content = ''
-        view = ''
-    }
-    else {
+    if (cell !== undefined) {
         content = cell.content()
         view = cell.view()
     }
@@ -62,7 +59,8 @@ app.post("/updateCell", (req, res) => {
         column: updatedCell.column,
         view: updatedCell.view()
     })
-    for (const cell of updatedCell.dependents) {
+    const allDependents: Cell[] = updatedCell.getAllDependents()
+    for (const cell of allDependents) {
         result.push({
             line: cell.line,
             column: cell.column,
