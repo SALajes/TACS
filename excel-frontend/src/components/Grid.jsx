@@ -63,7 +63,7 @@ class Grid extends React.Component {
             })
             .catch()
     }
-    
+
     onButtonClickHandler = () => {
         sendCellData(this.state.line, this.state.column, this.state.content)
             .then(cells => {
@@ -119,48 +119,56 @@ class Grid extends React.Component {
         this.setState({ editing: true})
     }
 
-    render() {        
+    render() {
         return (
             <div style={{ height: '100%', width: '100%'}}>
-                <div style={{ height: '100%', width: '98%', margin:'auto', display:'flex' }}>
-                    <div style={{ height: '100%', width: '5%', margin: 'auto' }}>
-                        <IconButton
-                            aria-label="delete"
-                            onClick={this.onDeleteClickHandler}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
+                <div style={{ height: '100%', width: '100%', margin:'auto', display:'flex' }}>
+                    <div style={{ height: '100%', width: '85%', margin: '0% auto' }}>
+                        <div style={{ height: '100%', width: '100%', display: 'flex' }}>
+                            <div style={{ height: '100%', width: '5%', margin: 'auto' }}>
+                                <IconButton
+                                    aria-label="delete"
+                                    onClick={this.onDeleteClickHandler}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </div>
+                            <div style={{ height: '100%', width: '90%', margin: 'auto 0% auto auto' }}>
+                                <TextField
+                                    multiline
+                                    variant={this.state.editing ? 'outlined' : 'filled'}
+                                    rows={1}
+                                    margin='dense'
+                                    fullWidth
+                                    value={this.state.content}
+                                    disabled={!this.state.editing}
+                                    onChange={this.onTextFieldChange}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ height: '100%', width: '100%', display: 'flex' }}>
+                            <div style={{ height: '100%', width: '5%', margin: 'auto' }}>
+                                <TextField
+                                    variant='outlined'
+                                    margin='dense'
+                                    disabled
+                                    value={this.state.line !== -1 ? `${COL_TO_ASCII(this.state.column)}${this.state.line + 1}` : ""}
+                                />
+                            </div>
+                            <div style={{ height: '100%', width: '90%', margin: 'auto 0% auto auto' }}>
+                                <TextField
+                                    multiline
+                                    variant='filled'
+                                    rows={1}
+                                    margin='dense'
+                                    fullWidth
+                                    value={this.state.view}
+                                    disabled
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <div style={{ height: '100%', width: '5%', margin: 'auto 1%'}}>
-                        <TextField
-                            variant='outlined'
-                            margin='dense'
-                            disabled
-                            value={this.state.line !== -1 ? `${COL_TO_ASCII(this.state.column)}${this.state.line+1}` : ""}
-                        />
-                    </div>
-                    <div style={{ height: '100%', width: '70%', margin: '0% auto' }}>
-                        <TextField
-                            multiline
-                            variant={this.state.editing ? 'outlined' : 'filled'}
-                            rows={1}
-                            margin='dense'
-                            fullWidth
-                            value={this.state.content}
-                            disabled={!this.state.editing}
-                            onChange={this.onTextFieldChange}
-                        />
-                        <TextField
-                            multiline
-                            variant='filled'
-                            rows={1}
-                            margin='dense'
-                            fullWidth
-                            value={this.state.view}
-                            disabled
-                        />
-                    </div>
-                    <div style={{ height: '100%', width: '10%', margin: 'auto 1%' }}>
+                    <div style={{ height: '100%', width: '10%', margin: 'auto' }}>
                         <Button
                             onClick={this.onButtonClickHandler}
                             variant="outlined"
@@ -168,7 +176,7 @@ class Grid extends React.Component {
                             fullWidth
                         >OK</Button>
                     </div>
-                </div>                
+                </div>
                 <DataGrid
                     rows={this.state.rows}
                     columns={this.columns}
