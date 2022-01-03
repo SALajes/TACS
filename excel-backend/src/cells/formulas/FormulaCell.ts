@@ -60,7 +60,7 @@ export default abstract class FormulaCell extends Cell {
             return "!Circular dependence found!"
         for (const dependency of this.dependencies)
             if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException))
-                return "!Formula references a cell with an error"
+                return "!Formula references a cell with an error!"
         return this.calculateValue()
     }
 }

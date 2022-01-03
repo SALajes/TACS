@@ -5,6 +5,8 @@ import FormulaCell from '../cells/formulas/FormulaCell';
 import NumberCell from '../cells/NumberCell';
 import StringCell from '../cells/StringCell';
 import { ASCII_TO_COL } from '../utils/ascii';
+import EmptyCell from '../cells/EmptyCell';
+import SumCell from '../cells/formulas/SumCell';
 
 // type Grammar = {
 //     Statement: Cell,
@@ -56,9 +58,9 @@ import { ASCII_TO_COL } from '../utils/ascii';
 //     Arg: r => Parsimmon.alt(r.Number, r.CellReference, r.ArgString),
 //     ArgString: _ =>
 //         Parsimmon.seq(
-//             Parsimmon.regex(/"/),
-//             Parsimmon.regex(/[^"]*/).map(String),
-//             Parsimmon.regex(/"/)
+//             Parsimmon.regex(/'/),
+//             Parsimmon.regex(/[^']*/).map(String),
+//             Parsimmon.regex(/'/)
 //         ),
 //     CellReference: _ => Parsimmon.seq(Parsimmon.letters,Parsimmon.digits),
 //     Value: r => Parsimmon.alt(r.Number, r.String),
@@ -76,17 +78,25 @@ type Grammar = {
     Statement: Cell,
     Formula: FormulaCell,
     CellReference: [string, string],
-    Value: NumberCell | StringCell,
-    Number: NumberCell,
-    String: StringCell
+    Value: number | string,
+    Number: number,
+    String: string,
+    BinaryOperation: SumCell // | SubCell | MulCell | DivCell
 }
 
 export const Lang = Parsimmon.createLanguage<Grammar>({
-    Statement: r => Parsimmon.alt(r.Formula, r.Value),
+    Statement: r => Parsimmon.alt(r.Formula, r.Value.map(i => {
+        if(typeof i === "number")
+            return new NumberCell(i)
+        else if(typeof i === "string")
+            return new StringCell(i)
+        else return new EmptyCell()
+    })),
     Formula: r => Parsimmon.seq(
         Parsimmon.regex(/=/),
         Parsimmon.alt(
-            r.CellReference.map(i => new ReferenceCell(`=${i[0]}${i[1]}`, [Number(i[1]) - 1, ASCII_TO_COL(i[0])]))
+            r.CellReference.map(i => new ReferenceCell(i)),
+            r.BinaryOperation
         )
     ).map(i => i[1]),
     CellReference: _ => Parsimmon.seq(Parsimmon.regex(/[a-z]+/i), Parsimmon.regex(/[0-9]+/)).map(i => [i[0].toUpperCase(),i[1]]),
@@ -94,13 +104,39 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     Number: _ => Parsimmon.alt(
         Parsimmon.regexp(/[0-9]+(\.[0-9]+)?/),
         Parsimmon.regexp(/\.[0-9]+/),
-    ).map(i => new NumberCell(Number(i))),
+    ).map(i => Number(i).valueOf()),
     String: _ => Parsimmon.alt(
-        Parsimmon.regex(/=/).map(String),
-        Parsimmon.regex(/[^=].*/).map(String),
-    ).map(i => new StringCell(i))
+        Parsimmon.regex(/=/),
+        Parsimmon.regex(/[^=].*/),
+    ),
+    BinaryOperation: r => Parsimmon.seq(
+        Parsimmon.alt(
+            Parsimmon.string('SUM')
+            // Parsimmon.string('SUB'), Parsimmon.string('MUL'), Parsimmon.string('DIV')
+        ),
+        Parsimmon.string('('),
+        Parsimmon.alt(r.CellReference, r.Number, r.String),
+        Parsimmon.string(','),
+        Parsimmon.alt(r.CellReference, r.Number, r.String),
+        Parsimmon.string(')')
+    ).map(i => {
+        const formula:string = `=${i[0]}(${argumentToString(i[2])},${argumentToString(i[4])})`
+
+        switch (i[0]) {
+            case 'SUM':
+                return new SumCell(formula, i[2], i[4])
+            //
+        }
+    })
 });
 
-// Lang.Statement.tryParse("=A1") //?
-// const input = "7u8uu8" // ?
+
+function argumentToString(arg: number | string | [string, string]) : string {
+    if(typeof arg === "number" || typeof arg === "string")
+        return arg.toString()
+    else return `${arg[0]}${arg[1]}`
+}
+
+// Lang.Statement.tryParse('=A1') //?
+// const input = '7u8uu8' // ?
 // Lang.Statement.tryParse(input) // ?
