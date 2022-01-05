@@ -1,10 +1,12 @@
 import Cell from "../Cell"
 import { findCell } from "../cellsManager"
+import { Literal } from "../../utils/types"
 import EmptyCell from "../EmptyCell"
 import ErrorCell from "../ErrorCell"
 
 export default abstract class FormulaCell extends Cell {
     formula: string
+    hasCircularDependency: boolean = false
     hasException: boolean = false
     dependencies: Cell[] = new Array<Cell>()
 
@@ -18,7 +20,7 @@ export default abstract class FormulaCell extends Cell {
     protected analyseDependency(cells: Cell[], references: [number, number][]): void {
         for (const reference of references) {
             if (this.line === reference[0] && this.column === reference[1]) {
-                this.hasException = true
+                this.hasCircularDependency = true
                 continue
             }
 
@@ -26,7 +28,7 @@ export default abstract class FormulaCell extends Cell {
             if (referenceCell !== undefined) {
                 const allDependents = this.getAllDependents()
                 if (findCell(allDependents, referenceCell) !== undefined) {
-                    this.hasException = true
+                    this.hasCircularDependency = true
                     this.formula = ''
                     continue
                 }
@@ -49,18 +51,23 @@ export default abstract class FormulaCell extends Cell {
         this.dependencies = new Array<Cell>()
     }
 
-    abstract calculateValue(): string
+    abstract calculateValue(): Literal
 
     content(): string {
         return this.formula
     }
 
-    view(): string {
-        if (this.hasException)
+    getValue(): Literal {
+        this.hasException = false
+        if (this.hasCircularDependency) {
+            this.hasException = true
             return "!Circular dependence found!"
+        }
         for (const dependency of this.dependencies)
-            if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException))
+            if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException)) {
+                this.hasException = true
                 return "!Formula references a cell with an error!"
+            }
         return this.calculateValue()
     }
 }

@@ -1,4 +1,5 @@
 import { ASCII_TO_COL } from "../../utils/ascii"
+import { Literal } from "../../utils/types"
 import Cell from "../Cell"
 import EmptyCell from "../EmptyCell"
 import FormulaCell from "./FormulaCell"
@@ -16,13 +17,17 @@ export default class ReferenceCell extends FormulaCell {
         this.analyseDependency(cells, [this.reference])
     }
 
-    findReferenceRoot(): Cell { //TODO
-        return null
+    findReferenceRoot(): Cell {
+        let cell: Cell = this.dependencies[0]
+        while (cell instanceof ReferenceCell) {
+            cell = cell.dependencies[0]
+        }
+        return cell
     }
 
-    calculateValue(): string {
+    calculateValue(): Literal {
         if (this.dependencies.length === 0)
             return ''
-        return this.dependencies[0].view()
+        return this.dependencies[0].getValue()
     }
 }

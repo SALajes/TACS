@@ -1,3 +1,4 @@
+import { Literal } from "../utils/types"
 import Cell from "./Cell"
 
 export default class NumberCell extends Cell{
@@ -8,8 +9,8 @@ export default class NumberCell extends Cell{
         this.num = num
     }
 
-    view():string {
-        return this.num.toString()
+    getValue():Literal {
+        return this.num
     }
 
     content(): string {

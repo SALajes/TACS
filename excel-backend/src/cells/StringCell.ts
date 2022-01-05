@@ -1,3 +1,4 @@
+import { Literal } from "../utils/types"
 import Cell from "./Cell"
 
 export default class StringCell extends Cell {
@@ -8,7 +9,7 @@ export default class StringCell extends Cell {
         this.str = str
     }
 
-    view(): string {
+    getValue(): Literal {
         return this.str
     }
 

@@ -20,7 +20,7 @@ app.get("/all", (_req, res) => {
         result.push({
             line: cell.line,
             column: cell.column,
-            view: cell.view()
+            view: cell.getValue()
         })
     }
     res.status(200).json({
@@ -36,7 +36,7 @@ app.get("/getCell", (req, res) => {
 
     if (cell !== undefined) {
         content = cell.content()
-        view = cell.view()
+        view = cell.getValue().toString()
     }
 
     res.status(200).json({
@@ -56,14 +56,14 @@ app.post("/updateCell", (req, res) => {
     result.push({
         line: updatedCell.line,
         column: updatedCell.column,
-        view: updatedCell.view()
+        view: updatedCell.getValue()
     })
     const allDependents: Cell[] = updatedCell.getAllDependents()
     for (const cell of allDependents) {
         result.push({
             line: cell.line,
             column: cell.column,
-            view: cell.view()
+            view: cell.getValue()
         })
     }
     res.status(200).json({

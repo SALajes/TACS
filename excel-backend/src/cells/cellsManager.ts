@@ -55,6 +55,10 @@ export function findCell(cellArray: Cell[], lineOrCell: number | string | Cell, 
     return undefined
 }
 
+export function findInCells(line: number, column: number) {
+    return cells.find((elem) => { return elem.line === line && elem.column === column })
+}
+
 function removeRemovableCells(): void {
     for (let i: number = 0; i < cells.length; i++)
         if (cells[i].dependents.length === 0 && (cells[i] instanceof EmptyCell))

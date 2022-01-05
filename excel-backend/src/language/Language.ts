@@ -107,7 +107,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     ).map(i => Number(i).valueOf()),
     String: _ => Parsimmon.alt(
         Parsimmon.regex(/=/),
-        Parsimmon.regex(/[^=].*/),
+        Parsimmon.regex(/[^=][^"]*/),
     ),
     BinaryOperation: r => Parsimmon.seq(
         Parsimmon.alt(
@@ -115,9 +115,9 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             // Parsimmon.string('SUB'), Parsimmon.string('MUL'), Parsimmon.string('DIV')
         ),
         Parsimmon.string('('),
-        Parsimmon.alt(r.CellReference, r.Number, r.String),
+        Parsimmon.alt(Parsimmon.seq(Parsimmon.string('\"'), r.String, Parsimmon.string('\"')).map(i => i[1]), r.CellReference, r.Number),
         Parsimmon.string(','),
-        Parsimmon.alt(r.CellReference, r.Number, r.String),
+        Parsimmon.alt(Parsimmon.seq(Parsimmon.string('\"'), r.String, Parsimmon.string('\"')).map(i => i[1]), r.CellReference, r.Number),
         Parsimmon.string(')')
     ).map(i => {
         const formula:string = `=${i[0]}(${argumentToString(i[2])},${argumentToString(i[4])})`
@@ -132,10 +132,13 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
 
 
 function argumentToString(arg: number | string | [string, string]) : string {
-    if(typeof arg === "number" || typeof arg === "string")
+    if(typeof arg === "number")
         return arg.toString()
+    else if(typeof arg === "string")
+        return `"${arg}"`
     else return `${arg[0]}${arg[1]}`
 }
+
 
 // Lang.Statement.tryParse('=A1') //?
 // const input = '7u8uu8' // ?

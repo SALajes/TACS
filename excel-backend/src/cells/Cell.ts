@@ -1,3 +1,4 @@
+import { Literal } from "../utils/types"
 import { findCell } from "./cellsManager"
 import FormulaCell from "./formulas/FormulaCell"
 
@@ -49,7 +50,7 @@ export default abstract class Cell {
         return result
     }
 
-    abstract view(): string
+    abstract getValue(): Literal
 
     abstract content(): string
 }

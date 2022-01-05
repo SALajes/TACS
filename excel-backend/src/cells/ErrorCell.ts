@@ -1,3 +1,4 @@
+import { Literal } from "../utils/types"
 import Cell from "./Cell"
 
 export default class ErrorCell extends Cell {
@@ -8,8 +9,8 @@ export default class ErrorCell extends Cell {
         this.str = str
     }
 
-    view(): string {
-        return `Error: ${this.str}`
+    getValue(): Literal {
+        return `!Syntax error!`
     }
 
     content(): string {
