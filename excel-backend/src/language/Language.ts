@@ -4,7 +4,6 @@ import Cell from '../cells/Cell';
 import FormulaCell from '../cells/formulas/FormulaCell';
 import NumberCell from '../cells/NumberCell';
 import StringCell from '../cells/StringCell';
-import { ASCII_TO_COL } from '../utils/ascii';
 import EmptyCell from '../cells/EmptyCell';
 import SumCell from '../cells/formulas/SumCell';
 import ArrayCell from '../cells/ArrayCell';
@@ -123,8 +122,3 @@ function argumentToString(arg: number | string | [string, string]) : string {
         return `"${arg}"`
     else return `${arg[0]}${arg[1]}`
 }
-
-
-// Lang.Statement.tryParse('=A1') //?
-// const input = '7u8uu8' // ?
-// Lang.Statement.tryParse(input) // ?
