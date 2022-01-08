@@ -7,6 +7,7 @@ import StringCell from '../cells/StringCell';
 import EmptyCell from '../cells/EmptyCell';
 import SumCell from '../cells/formulas/SumCell';
 import ArrayCell from '../cells/ArrayCell';
+import SubCell from '../cells/formulas/SubCell';
 
 type Grammar = {
     Statement: Cell,
@@ -58,8 +59,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     BinaryOperation: (r) =>
     Parsimmon.seq(
         Parsimmon.alt(
-        Parsimmon.string("SUM")
-        // Parsimmon.string('SUB'), Parsimmon.string('MUL'), Parsimmon.string('DIV')
+        Parsimmon.string("SUM"),
+        Parsimmon.string("SUB")// , Parsimmon.string('MUL'), Parsimmon.string('DIV')
         ),
         Parsimmon.string("("),
         Parsimmon.alt(
@@ -87,6 +88,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
         switch (i[0]) {
         case "SUM":
             return new SumCell(formula, i[2], i[4]);
+        case "SUB":
+            return new SubCell(formula, i[2], i[4]);
             //
         }
     }),
