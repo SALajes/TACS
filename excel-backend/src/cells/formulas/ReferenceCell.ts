@@ -1,5 +1,5 @@
 import { ASCII_TO_COL } from "../../utils/ascii"
-import { Literal } from "../../utils/types"
+import { Literal, Reference } from "../../utils/types"
 import Cell from "../Cell"
 import EmptyCell from "../EmptyCell"
 import FormulaCell from "./FormulaCell"
@@ -7,7 +7,7 @@ import FormulaCell from "./FormulaCell"
 export default class ReferenceCell extends FormulaCell {
     reference: [number, number]
 
-    constructor(reference: [string, string]) {
+    constructor(reference: Reference) {
         super(`=${reference[0]}${reference[1]}`)
         this.formula = `=${reference[0]}${reference[1]}`
         this.reference = [Number(reference[1]) - 1, ASCII_TO_COL(reference[0])]
