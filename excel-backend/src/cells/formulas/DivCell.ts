@@ -3,7 +3,7 @@ import FormulaCell from "./FormulaCell"
 import BinaryOperationCell from "./BinaryOperationCell"
 import { Literal, Operand } from "../../utils/types"
 
-export default class MulCell extends BinaryOperationCell {
+export default class DivCell extends BinaryOperationCell {
     constructor(formula: string, op1: Operand, op2: Operand){
         super(formula, op1, op2)
     }
