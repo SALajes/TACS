@@ -10,13 +10,13 @@ export default class SumCell extends OperationCell {
         this.minNumArgs = 2
     }
 
-    calculateValue(): Literal {        
+    calculateValue(): Literal {
         const values : Literal[] = this.operandsValueExtraction()
         if(!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
-        
+
         let result : number = 0
 
-        for(let v of values){
+        for(const v of values){
             if (typeof v === "number"){
                 result += v
             }

@@ -3,7 +3,7 @@ import { findCell } from "../cellsManager"
 import { Literal } from "../../utils/types"
 import EmptyCell from "../EmptyCell"
 import ErrorCell from "../ErrorCell"
-import Reference from "../utils/Reference"
+import Reference from "../../utils/Reference"
 
 export default abstract class FormulaCell extends Cell {
     formula: string
@@ -20,14 +20,14 @@ export default abstract class FormulaCell extends Cell {
 
     protected analyseDependency(cells: Cell[], references: Reference[]): void {
         for (const reference of references) {
-            if(reference === null) continue 
+            if(reference === null) continue
 
-            if (this.line === reference[0] && this.column === reference[1]) {
+            if (this.line === reference.line && this.column === reference.column) {
                 this.hasCircularDependency = true
                 continue
             }
 
-            const referenceCell = findCell(cells, reference[0], reference[1])
+            const referenceCell = findCell(cells, reference.line, reference.column)
             if (referenceCell !== undefined) {
                 const allDependents = this.getAllDependents()
                 if (findCell(allDependents, referenceCell) !== undefined) {
@@ -41,7 +41,7 @@ export default abstract class FormulaCell extends Cell {
             }
 
             const cell: Cell = new EmptyCell()
-            cell.setCoords(reference[0], reference[1])
+            cell.setCoords(reference.line, reference.column)
             this.dependencies.push(cell)
             cell.addDependent(this)
             cells.push(cell)
@@ -64,7 +64,7 @@ export default abstract class FormulaCell extends Cell {
         this.hasException = false
         if (this.hasCircularDependency) {
             this.hasException = true
-            return "!Circular dependence found!"
+            return "!Circular dependency found!"
         }
         for (const dependency of this.dependencies)
             if (dependency instanceof ErrorCell || (dependency instanceof FormulaCell && dependency.hasException)) {

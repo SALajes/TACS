@@ -13,4 +13,8 @@ export default class Reference {
   getReferenceString(): ReferenceString {
       return [COL_TO_ASCII(this.column), (this.line + 1).toString()]
   }
+
+  toString (): string {
+    return `${COL_TO_ASCII(this.column)}${(this.line + 1).toString()}`
+  }
 }

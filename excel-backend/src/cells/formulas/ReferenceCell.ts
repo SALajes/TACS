@@ -1,5 +1,5 @@
 import { ASCII_TO_COL } from "../../utils/ascii"
-import { Literal, ReferenceString } from "../../utils/types"
+import { Literal } from "../../utils/types"
 import Cell from "../Cell"
 import EmptyCell from "../EmptyCell"
 import FormulaCell from "./FormulaCell"
@@ -8,10 +8,10 @@ import Reference from "../../utils/Reference"
 export default class ReferenceCell extends FormulaCell {
     reference: Reference
 
-    constructor(reference: ReferenceString) {
-        super(`=${reference[0]}${reference[1]}`)
-        this.formula = `=${reference[0]}${reference[1]}`
-        this.reference = new Reference(reference[0], reference[1])
+    constructor(reference: Reference) {
+        super(`=${reference.getReferenceString()[0]}${reference.getReferenceString()[1]}`)
+        this.formula = `=${reference.getReferenceString()[0]}${reference.getReferenceString()[1]}`
+        this.reference = reference
     }
 
     analyseDependencies(cells: Cell[]): void {

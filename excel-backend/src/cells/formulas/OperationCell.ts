@@ -9,7 +9,7 @@ import Reference from "../../utils/Reference";
 
 export default abstract class OperationCell extends FormulaCell{
     operands : Operand[]
-    references: Reference[]
+    references: Reference[] = []
     minNumArgs: number
     maxNumArgs: number
 
@@ -22,12 +22,16 @@ export default abstract class OperationCell extends FormulaCell{
             else return null
         }
 
-        for (let i = 0; i < this.operands.length; i++)
-            this.references[i] = getReference(this.operands[i])
+        for (const operand of operands)
+            this.references.push(getReference(operand))
     }
 
     protected validNumArgs(numArgs: number): boolean {
-        return ((this.minNumArgs === undefined || this.minNumArgs <= numArgs) &&(this.maxNumArgs === undefined || this.maxNumArgs >= numArgs))
+        if ((this.minNumArgs === undefined || this.minNumArgs <= numArgs) &&(this.maxNumArgs === undefined || this.maxNumArgs >= numArgs))
+            return true
+        else
+            this.hasException = true
+            return false
     }
 
     operandsValueExtraction(): Literal[]{

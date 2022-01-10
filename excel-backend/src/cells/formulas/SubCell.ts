@@ -9,10 +9,10 @@ export default class SubCell extends OperationCell {
         this.minNumArgs = 2
     }
 
-    calculateValue(): Literal {        
+    calculateValue(): Literal {
         const values : Literal[] = this.operandsValueExtraction()
         if(!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
-        
+
         let result : number = 0
 
         const getNumber = (value: Literal): number => {
@@ -22,10 +22,10 @@ export default class SubCell extends OperationCell {
         }
 
         for(let i=0; i < values.length; i++){
-            let v: number = getNumber(values[i])
+            const v: number = getNumber(values[i])
 
             if (v !== null){
-                if(i == 0){
+                if(i === 0){
                     result += v
                 }
                 else result -= v

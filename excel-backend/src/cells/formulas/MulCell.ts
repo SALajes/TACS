@@ -16,7 +16,7 @@ export default class MulCell extends OperationCell {
 
         let result: number = 1;
 
-        for (let v of values) {
+        for (const v of values) {
           if (typeof v === "number") {
             result *= v;
           } else {
