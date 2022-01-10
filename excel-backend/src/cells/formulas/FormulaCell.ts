@@ -3,6 +3,7 @@ import { findCell } from "../cellsManager"
 import { Literal } from "../../utils/types"
 import EmptyCell from "../EmptyCell"
 import ErrorCell from "../ErrorCell"
+import Reference from "../utils/Reference"
 
 export default abstract class FormulaCell extends Cell {
     formula: string
@@ -17,8 +18,10 @@ export default abstract class FormulaCell extends Cell {
 
     abstract analyseDependencies(cells: Cell[]): void
 
-    protected analyseDependency(cells: Cell[], references: [number, number][]): void {
+    protected analyseDependency(cells: Cell[], references: Reference[]): void {
         for (const reference of references) {
+            if(reference === null) continue 
+
             if (this.line === reference[0] && this.column === reference[1]) {
                 this.hasCircularDependency = true
                 continue

@@ -10,8 +10,9 @@ import SubCell from '../cells/formulas/SubCell';
 import MulCell from '../cells/formulas/MulCell';
 import DivCell from '../cells/formulas/DivCell';
 import ArrayCell from '../cells/ArrayCell';
-import BinaryOperationCell from '../cells/formulas/BinaryOperationCell';
-import { Literal, Operand, Reference } from '../utils/types';
+import OperationCell from '../cells/formulas/OperationCell';
+import { Literal, Operand, ReferenceString } from '../utils/types';
+import Reference from '../utils/Reference';
 
 type Grammar = {
     Statement: Cell,
@@ -22,7 +23,7 @@ type Grammar = {
     String: string,
     Array: number[],
     Operand: Operand,
-    BinaryOperation: BinaryOperationCell
+    Operation: OperationCell
 }
 
 export const Lang = Parsimmon.createLanguage<Grammar>({
@@ -41,14 +42,14 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             Parsimmon.regex(/=/),
             Parsimmon.alt(
                 r.CellReference.map((i) => new ReferenceCell(i)),
-                r.BinaryOperation
+                r.Operation
             )
         ).map((i) => i[1]),
     CellReference: (_) =>
         Parsimmon.seq(
             Parsimmon.regex(/[a-z]+/i),
             Parsimmon.regex(/[0-9]+/)
-        ).map((i) => [i[0].toUpperCase(), i[1]]
+        ).map((i) => new Reference(i[0].toUpperCase(), i[1])
     ),
     Literal: (r) => Parsimmon.alt(r.Number, r.String, r.Array),
     Number: (_) =>
@@ -71,7 +72,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             r.CellReference,
             r.Number
         ),
-    BinaryOperation: (r) =>
+    Operation: (r) =>
         Parsimmon.seq(
             Parsimmon.alt(
                 Parsimmon.string("SUM"),
@@ -80,21 +81,35 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                 Parsimmon.string('DIV')
             ),
             Parsimmon.string("("),
-            r.Operand,
-            Parsimmon.string(","),
-            r.Operand,
+            Parsimmon.seq(
+                r.Operand,
+                Parsimmon.seq(
+                    Parsimmon.string(","),
+                    r.Operand,
+                ).many().map((i) => {
+                    const operands: Operand[] = [];
+                    for (const item of i) operands.push(item[1]);
+                    return operands;
+                })
+            ).times(0,1).map((i) => {
+                if (i.length === 0) return []
+                const res: Operand[] = []
+                res.push(i[0][0])
+                res.push(...i[0][1])
+                return res
+            }),
             Parsimmon.string(")")
         ).map((i) => {
-            const formula: string = `=${i[0]}(${argumentToString( i[2])},${argumentToString(i[4])})`;
+            const formula: string = `=${i[0]}(${argumentsToString(i[2])})`;
             switch (i[0]) {
                 case "SUM":
-                    return new SumCell(formula, i[2], i[4]);
+                    return new SumCell(formula, i[2]);
                 case "SUB":
-                    return new SubCell(formula, i[2], i[4]);
+                    return new SubCell(formula, i[2]);
                 case "MUL":
-                    return new MulCell(formula, i[2], i[4]);
+                    return new MulCell(formula, i[2]);
                 case "DIV":
-                    return new DivCell(formula, i[2], i[4]);
+                    return new DivCell(formula, i[2]);
             }
         }),
     Array: (r) =>
@@ -111,8 +126,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                     return res
                 })
             ).times(0, 1).map((i) => {
-                const res: number[] = []
                 if (i.length === 0) return []
+                const res: number[] = []
                 res.push(i[0][0])
                 res.push(...i[0][1])
                 return res
@@ -121,11 +136,18 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
         ).map((i) => i[1]),
 });
 
+function argumentsToString(args: Operand[]) : string {
+    if (args.length === 0) return ""
 
-function argumentToString(arg: Operand) : string {
-    if(typeof arg === "number")
-        return arg.toString()
-    else if(typeof arg === "string")
-        return `"${arg}"`
-    else return `${arg[0]}${arg[1]}`
+    const argToStr = (arg: Operand): string => {
+        if (typeof arg === "number") return arg.toString()
+        else if (typeof arg === "string") return `"${arg}"`
+        else return `${arg[0]}${arg[1]}`
+    }
+    
+    let result: string = argToStr(args[0])
+    for (let i = 1; i < args.length; i++) {
+        result += `,${argToStr(args[i])}`
+    }
+    return result
 }

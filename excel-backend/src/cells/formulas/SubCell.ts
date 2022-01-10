@@ -1,22 +1,40 @@
 import Cell from "../Cell";
 import FormulaCell from "./FormulaCell"
-import BinaryOperationCell from "./BinaryOperationCell"
+import OperationCell from "./OperationCell"
 import { Literal, Operand } from "../../utils/types"
 
-export default class SubCell extends BinaryOperationCell {
-    constructor(formula: string, op1: Operand, op2: Operand){
-        super(formula, op1, op2)
+export default class SubCell extends OperationCell {
+    constructor(formula: string, operands: Operand[]){
+        super(formula, operands)
+        this.minNumArgs = 2
     }
 
-    calculateValue(): Literal {
-        const result : [Literal, Literal] = this.operandsValueExtraction()
+    calculateValue(): Literal {        
+        const values : Literal[] = this.operandsValueExtraction()
+        if(!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
+        
+        let result : number = 0
 
-        if (typeof result[0] === "number" && typeof result[1] === "number"){
-            return result[0] - result[1]
+        const getNumber = (value: Literal): number => {
+            if(typeof value === "number")
+                return value
+            else return null
         }
-        else {
-            this.hasException = true
-            return "!Invalid Types!"
+
+        for(let i=0; i < values.length; i++){
+            let v: number = getNumber(values[i])
+
+            if (v !== null){
+                if(i == 0){
+                    result += v
+                }
+                else result -= v
+            }
+            else {
+                this.hasException = true
+                return "!Invalid Types!"
+            }
         }
+        return result
     }
 }

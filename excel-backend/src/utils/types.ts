@@ -1,6 +1,8 @@
-export type Operand = number | [string, string] | string
+import Reference from "./Reference"
+
+export type ReferenceString = [string, string]
+export type Operand = number | string | Reference
 export type Literal = number | string | number[]
-export type Reference = [string, string]
 
 export function toString(value: Literal): string {
     if (Array.isArray(value))

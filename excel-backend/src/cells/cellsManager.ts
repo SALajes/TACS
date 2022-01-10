@@ -3,6 +3,7 @@ import Cell from "./Cell";
 import EmptyCell from "./EmptyCell";
 import ErrorCell from "./ErrorCell";
 import FormulaCell from "./formulas/FormulaCell";
+import Reference from "../utils/Reference";
 
 export const cells: Cell[] = new Array<Cell>()
 
@@ -55,8 +56,8 @@ export function findCell(cellArray: Cell[], lineOrCell: number | string | Cell, 
     return undefined
 }
 
-export function findInCells(line: number, column: number) {
-    return cells.find((elem) => { return elem.line === line && elem.column === column })
+export function findInCells(reference: Reference) {
+    return cells.find((elem) => { return elem.line === reference.line && elem.column === reference.column; })
 }
 
 function removeRemovableCells(): void {
