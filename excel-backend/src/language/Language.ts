@@ -6,12 +6,7 @@ import ArrayCell from '../cells/literals/ArrayCell';
 import FormulaCell from '../cells/formulas/FormulaCell';
 import ReferenceCell from '../cells/formulas/ReferenceCell';
 import OperationCell from '../cells/formulas/operations/OperationCell';
-import SumCell from '../cells/formulas/operations/SumCell';
-import SubCell from '../cells/formulas/operations/SubCell';
-import MulCell from '../cells/formulas/operations/MulCell';
-import DivCell from '../cells/formulas/operations/DivCell';
-import LenCell from '../cells/formulas/operations/LenCell';
-import { Literal, Operand, operandToString } from '../utils/types';
+import { Literal, Operand, operandToString, Operations } from '../utils/types';
 import Reference from '../utils/Reference';
 
 type Grammar = {
@@ -75,11 +70,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     Operation: (r) =>
         Parsimmon.seq(
             Parsimmon.alt(
-                Parsimmon.string("SUM"),
-                Parsimmon.string("SUB"),
-                Parsimmon.string('MUL'),
-                Parsimmon.string('DIV'),
-                Parsimmon.string('LEN')
+                ...getOperationParsers()
             ),
             Parsimmon.string("("),
             Parsimmon.seq(
@@ -100,21 +91,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                 return res
             }),
             Parsimmon.string(")")
-        ).map((i) => {
-            const formula: string = `=${i[0]}(${argumentsToString(i[2])})`;
-            switch (i[0]) {
-                case "SUM":
-                    return new SumCell(formula, i[2]);
-                case "SUB":
-                    return new SubCell(formula, i[2]);
-                case "MUL":
-                    return new MulCell(formula, i[2]);
-                case "DIV":
-                    return new DivCell(formula, i[2]);
-                case "LEN":
-                    return new LenCell(formula, i[2]);
-            }
-        }),
+        ).map((i) => new Operations[i[0] as keyof typeof Operations](`=${i[0]}(${argumentsToString(i[2])})`, i[2])),
     Array: (r) =>
         Parsimmon.seq(
             Parsimmon.string("["),
@@ -138,6 +115,13 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
         Parsimmon.string("]")
         ).map((i) => i[1]),
 });
+
+function getOperationParsers(): Parsimmon.Parser<string>[] {
+    const parsers: Parsimmon.Parser<string>[] = []
+    for (const operation of Object.keys(Operations))
+        parsers.push(Parsimmon.string(operation))
+    return parsers
+}
 
 function argumentsToString(args: Operand[]) : string {
     if (args.length === 0) return ""

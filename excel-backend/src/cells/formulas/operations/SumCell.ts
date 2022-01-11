@@ -2,7 +2,6 @@ import OperationCell from "./OperationCell"
 import { Literal, Operand } from "../../../utils/types"
 
 export default class SumCell extends OperationCell {
-
     constructor(formula: string, operands: Operand[]){
         super(formula, operands)
         this.minNumArgs = 2

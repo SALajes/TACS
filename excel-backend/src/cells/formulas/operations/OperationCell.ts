@@ -5,7 +5,6 @@ import { findInCells } from "../../cellsManager";
 import ReferenceCell from "../ReferenceCell";
 import Reference from "../../../utils/Reference";
 
-
 export default abstract class OperationCell extends FormulaCell{
     operands : Operand[]
     references: Reference[] = []

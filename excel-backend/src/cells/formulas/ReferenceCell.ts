@@ -1,7 +1,5 @@
-import { ASCII_TO_COL } from "../../utils/ascii"
 import { Literal } from "../../utils/types"
 import Cell from "../Cell"
-import EmptyCell from "../EmptyCell"
 import FormulaCell from "./FormulaCell"
 import Reference from "../../utils/Reference"
 
