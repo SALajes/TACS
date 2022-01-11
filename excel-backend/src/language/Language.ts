@@ -11,7 +11,7 @@ import MulCell from '../cells/formulas/MulCell';
 import DivCell from '../cells/formulas/DivCell';
 import ArrayCell from '../cells/ArrayCell';
 import OperationCell from '../cells/formulas/OperationCell';
-import { Literal, Operand, ReferenceString, toString } from '../utils/types';
+import { Literal, Operand, ReferenceString, operandToString } from '../utils/types';
 import Reference from '../utils/Reference';
 
 type Grammar = {
@@ -34,7 +34,6 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                 if (typeof i === "number") return new NumberCell(i)
                 else if (typeof i === "string") return new StringCell(i)
                 else if (Array.isArray(i))  return new ArrayCell(i)
-                else return new EmptyCell()
             })
         ),
     Formula: (r) =>
@@ -139,9 +138,9 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
 function argumentsToString(args: Operand[]) : string {
     if (args.length === 0) return ""
 
-    let result: string = toString(args[0])
+    let result: string = operandToString(args[0])
     for (let i = 1; i < args.length; i++) {
-        result += `,${toString(args[i])}`
+        result += `,${operandToString(args[i])}`
     }
     return result
 }

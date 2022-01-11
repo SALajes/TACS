@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import Cell from "./cells/Cell";
 import { cellFactory, cells, findCell, updateCellMatrix } from "./cells/cellsManager";
-import { toString } from "./utils/types";
+import { literalToString } from "./utils/types";
 
 const app = express();
 const port = 8080; // default port to listen
@@ -21,7 +21,7 @@ app.get("/all", (_req, res) => {
         result.push({
             line: cell.line,
             column: cell.column,
-            view: toString(cell.getValue())
+            view: literalToString(cell.getValue())
         })
     }
     res.status(200).json({
@@ -37,7 +37,7 @@ app.get("/getCell", (req, res) => {
 
     if (cell !== undefined) {
         content = cell.content()
-        view = toString(cell.getValue());
+        view = literalToString(cell.getValue());
     }
 
     res.status(200).json({
@@ -57,14 +57,14 @@ app.post("/updateCell", (req, res) => {
     result.push({
         line: updatedCell.line,
         column: updatedCell.column,
-        view: toString(updatedCell.getValue())
+        view: literalToString(updatedCell.getValue())
     })
     const allDependents: Cell[] = updatedCell.getAllDependents()
     for (const cell of allDependents) {
         result.push({
           line: cell.line,
           column: cell.column,
-          view: toString(cell.getValue())
+          view: literalToString(cell.getValue())
         });
     }
     res.status(200).json({
