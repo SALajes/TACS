@@ -1,5 +1,5 @@
-import { Literal } from "../utils/types"
-import Cell from "./Cell"
+import { Literal } from "../../utils/types"
+import Cell from "../Cell"
 
 export default class ArrayCell extends Cell {
   array: number[];

@@ -1,7 +1,5 @@
-import Cell from "../Cell";
-import FormulaCell from "./FormulaCell"
 import OperationCell from "./OperationCell"
-import { Literal, Operand } from "../../utils/types"
+import { Literal, Operand } from "../../../utils/types"
 
 export default class SubCell extends OperationCell {
     constructor(formula: string, operands: Operand[]){

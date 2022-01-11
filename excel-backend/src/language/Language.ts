@@ -1,17 +1,17 @@
 import * as Parsimmon from 'parsimmon'
 import Cell from '../cells/Cell';
-import EmptyCell from '../cells/EmptyCell';
-import NumberCell from '../cells/NumberCell';
-import StringCell from '../cells/StringCell';
+import NumberCell from '../cells/literals/NumberCell';
+import StringCell from '../cells/literals/StringCell';
+import ArrayCell from '../cells/literals/ArrayCell';
 import FormulaCell from '../cells/formulas/FormulaCell';
 import ReferenceCell from '../cells/formulas/ReferenceCell';
-import SumCell from '../cells/formulas/SumCell';
-import SubCell from '../cells/formulas/SubCell';
-import MulCell from '../cells/formulas/MulCell';
-import DivCell from '../cells/formulas/DivCell';
-import ArrayCell from '../cells/ArrayCell';
-import OperationCell from '../cells/formulas/OperationCell';
-import { Literal, Operand, ReferenceString, operandToString } from '../utils/types';
+import OperationCell from '../cells/formulas/operations/OperationCell';
+import SumCell from '../cells/formulas/operations/SumCell';
+import SubCell from '../cells/formulas/operations/SubCell';
+import MulCell from '../cells/formulas/operations/MulCell';
+import DivCell from '../cells/formulas/operations/DivCell';
+import LenCell from '../cells/formulas/operations/LenCell';
+import { Literal, Operand, operandToString } from '../utils/types';
 import Reference from '../utils/Reference';
 
 type Grammar = {
@@ -69,7 +69,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                 Parsimmon.string('"')
             ).map((i) => i[1]),
             r.CellReference,
-            r.Number
+            r.Number,
+            r.Array
         ),
     Operation: (r) =>
         Parsimmon.seq(
@@ -77,7 +78,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                 Parsimmon.string("SUM"),
                 Parsimmon.string("SUB"),
                 Parsimmon.string('MUL'),
-                Parsimmon.string('DIV')
+                Parsimmon.string('DIV'),
+                Parsimmon.string('LEN')
             ),
             Parsimmon.string("("),
             Parsimmon.seq(
@@ -109,6 +111,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                     return new MulCell(formula, i[2]);
                 case "DIV":
                     return new DivCell(formula, i[2]);
+                case "LEN":
+                    return new LenCell(formula, i[2]);
             }
         }),
     Array: (r) =>

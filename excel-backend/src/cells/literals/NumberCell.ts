@@ -1,5 +1,5 @@
-import { Literal } from "../utils/types"
-import Cell from "./Cell"
+import { Literal } from "../../utils/types"
+import Cell from "../Cell"
 
 export default class NumberCell extends Cell{
     num: number
