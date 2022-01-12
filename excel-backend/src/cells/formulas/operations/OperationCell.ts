@@ -32,7 +32,7 @@ export default abstract class OperationCell extends FormulaCell{
             return false
     }
 
-    operandsValueExtraction(): Literal[]{
+    protected operandsValueExtraction(): Literal[]{
         const extractValue = (operand: Operand, reference: Reference): Literal =>{
             if(operand instanceof Reference) {
                 let cell: Cell = findInCells(reference)

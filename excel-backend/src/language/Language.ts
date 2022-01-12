@@ -3,10 +3,11 @@ import Cell from '../cells/Cell';
 import NumberCell from '../cells/literals/NumberCell';
 import StringCell from '../cells/literals/StringCell';
 import ArrayCell from '../cells/literals/ArrayCell';
+import ObjectCell from '../cells/literals/ObjectCell';
 import FormulaCell from '../cells/formulas/FormulaCell';
 import ReferenceCell from '../cells/formulas/ReferenceCell';
 import OperationCell from '../cells/formulas/operations/OperationCell';
-import { Literal, Operand, operandToString, Operations } from '../utils/types';
+import { Literal, ObjectLiteral, Operand, operandToString, Operations } from '../utils/types';
 import Reference from '../utils/Reference';
 
 type Grammar = {
@@ -18,7 +19,8 @@ type Grammar = {
     String: string,
     Array: number[],
     Operand: Operand,
-    Operation: OperationCell
+    Operation: OperationCell,
+    Object: ObjectLiteral
 }
 
 export const Lang = Parsimmon.createLanguage<Grammar>({
@@ -28,7 +30,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             r.Literal.map((i) => {
                 if (typeof i === "number") return new NumberCell(i)
                 else if (typeof i === "string") return new StringCell(i)
-                else if (Array.isArray(i))  return new ArrayCell(i)
+                else if (Array.isArray(i)) return new ArrayCell(i)
+                else return new ObjectCell(i)
             })
         ),
     Formula: (r) =>
@@ -45,7 +48,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             Parsimmon.regex(/[0-9]+/)
         ).map((i) => new Reference(i[0].toUpperCase(), i[1])
     ),
-    Literal: (r) => Parsimmon.alt(r.Number, r.String, r.Array),
+    Literal: (r) => Parsimmon.alt(r.Number, r.String, r.Array, r.Object),
     Number: (_) =>
         Parsimmon.alt(
             Parsimmon.regexp(/\-?[0-9]+(\.[0-9]+)?/),
@@ -54,7 +57,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     String: (_) =>
         Parsimmon.alt(
             Parsimmon.regex(/=/),
-            Parsimmon.regex(/[^=\-\.\[\]][^"\[\]]*/)
+            //Parsimmon.regex(/[^=\{\}\-\.\[\]\:\,][^"\{\}\[\]\:\,]*/)
+            Parsimmon.regex(/[a-z0-9\-\!\?\&][a-z0-9\-\!\?\&\.]*/i)
         ),
     Operand: (r) =>
         Parsimmon.alt(
@@ -65,7 +69,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             ).map((i) => i[1]),
             r.CellReference,
             r.Number,
-            r.Array
+            r.Array,
+            r.Object
         ),
     Operation: (r) =>
         Parsimmon.seq(
@@ -114,6 +119,44 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
             }),
         Parsimmon.string("]")
         ).map((i) => i[1]),
+    Object: (r) =>
+            Parsimmon.seq(
+                Parsimmon.string("{"),
+                Parsimmon.seq(
+                    Parsimmon.seq(
+                        Parsimmon.string('"'),
+                        r.String,
+                        Parsimmon.string('"')
+                    ).map((i) => i[1]),
+                    Parsimmon.string(":"),
+                    Parsimmon.alt(r.Number, r.String, r.Array).map(i => i as number | string | number[]),
+                    Parsimmon.seq(
+                        Parsimmon.string(","),
+                        Parsimmon.seq(
+                            Parsimmon.string('"'),
+                            r.String,
+                            Parsimmon.string('"')
+                        ).map((i) => i[1]),
+                        Parsimmon.string(":"),
+                        Parsimmon.alt(r.Number, r.String, r.Array).map(i => i as number | string | number[]),
+                    ).many().map((i) => {
+                        let res: ObjectLiteral = {}
+                        for (const item of i)
+                            if (!res.hasOwnProperty(item[1]))
+                                res[item[1]] = item[3]
+                        return res
+                    })
+                ).times(0, 1).map((i) => {
+                    if (i.length == 0) return {}
+                    let res: ObjectLiteral = {}
+                    res[i[0][0]] = i[0][2]
+                    for (const prop in i[0][3])
+                        if (!res.hasOwnProperty(prop))
+                            res[prop] = i[0][3][prop]
+                    return res
+                }),
+                Parsimmon.string("}")
+            ).map((i) => i[1])
 });
 
 function getOperationParsers(): Parsimmon.Parser<string>[] {
