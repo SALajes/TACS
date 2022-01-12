@@ -1,3 +1,6 @@
+import ArrayOpCell from "../cells/formulas/operations/ArrayOpCell"
+import MinCell from "../cells/formulas/operations/MinCell"
+import MaxCell from "../cells/formulas/operations/MaxCell"
 import PropCell from "../cells/formulas/operations/PropCell"
 import AtCell from "../cells/formulas/operations/AtCell"
 import DivCell from "../cells/formulas/operations/DivCell"
@@ -65,5 +68,8 @@ export const Operations = {
     'DIV': DivCell,
     'LEN': LenCell,
     'AT': AtCell,
-    'PROP': PropCell
+    'PROP': PropCell,
+    'MAX': MaxCell,
+    'MIN': MinCell,
+    'ARRAY': ArrayOpCell
 }

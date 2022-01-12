@@ -51,7 +51,6 @@ app.get("/getCell", (req, res) => {
 app.post("/updateCell", (req, res) => {
     const updatedCell:Cell = cellFactory(req.body.line, req.body.column, req.body.value.trim())
     updateCellMatrix(updatedCell)
-    // console.log(cells)
 
     const result: object[] = new Array<object>()
     result.push({
