@@ -1,23 +1,27 @@
 import OperationCell from "./OperationCell"
 import { Literal, Operand } from "../../../utils/types"
 
-export default class LenCell extends OperationCell {
+export default class ConcatCell extends OperationCell {
     constructor(formula: string, operands: Operand[]){
         super(formula, operands);
-        this.minNumArgs = 1;
-        this.maxNumArgs = 1;
+        this.minNumArgs = 2;
     }
 
     calculateValue(): Literal {
         const values : Literal[] = this.operandsValueExtraction()
         if(!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
 
-        if (Array.isArray(values[0]) || typeof values[0] === "string"){
-            return values[0].length
+        let result: string = ""
+
+        for(const v of values){
+            if (typeof v === "string" || typeof v === "number"){
+                result += v
+            }
+            else {
+                this.hasException = true
+                return "!Invalid Types!"
+            }
         }
-        else {
-            this.hasException = true
-            return "!Invalid Types!"
-        }
+        return result
     }
 }

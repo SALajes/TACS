@@ -9,6 +9,8 @@ import MulCell from "../cells/formulas/operations/MulCell"
 import SubCell from "../cells/formulas/operations/SubCell"
 import SumCell from "../cells/formulas/operations/SumCell"
 import Reference from "./Reference"
+import ConcatCell from "../cells/formulas/operations/ConcatCell"
+import SubstrCell from "../cells/formulas/operations/SubstrCell"
 
 export type ObjectLiteral = Record<string, number | string | number[]>
 export type ReferenceString = [string, string]
@@ -62,6 +64,7 @@ function objectLiteralToString(value: ObjectLiteral) {
 
 
 export const Operations = {
+    'SUBSTR': SubstrCell,
     'SUM': SumCell,
     'SUB': SubCell,
     'MUL': MulCell,
@@ -71,5 +74,6 @@ export const Operations = {
     'PROP': PropCell,
     'MAX': MaxCell,
     'MIN': MinCell,
-    'ARRAY': ArrayOpCell
+    'ARRAY': ArrayOpCell,
+    'CONCAT': ConcatCell
 }

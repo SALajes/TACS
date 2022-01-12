@@ -58,7 +58,7 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
         Parsimmon.alt(
             Parsimmon.regex(/=/),
             Parsimmon.regex(/[^=\{\}\-\.\[\]\:\,][^"\{\}\[\]\:\,]*/)
-            // Parsimmon.regex(/[a-z0-9\-\!\?\&][a-z0-9\-\!\?\&\.]*/i)
+            //  Parsimmon.regex(/[a-z0-9\-\!\?\&][a-z0-9\-\!\?\&\.]*/i)
         ),
     Operand: (r) =>
         Parsimmon.alt(
