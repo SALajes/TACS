@@ -11,8 +11,8 @@ export default class MaxCell extends OperationCell {
         const values: Literal[] = this.operandsValueExtraction()
         if (!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
 
-        let all: number[] = []
-        for (let value of values) {
+        const all: number[] = []
+        for (const value of values) {
             if (typeof value === "number") all.push(value)
             else if (Array.isArray(value)) all.push(...value)
             else {

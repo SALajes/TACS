@@ -57,8 +57,8 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
     String: (_) =>
         Parsimmon.alt(
             Parsimmon.regex(/=/),
-            //Parsimmon.regex(/[^=\{\}\-\.\[\]\:\,][^"\{\}\[\]\:\,]*/)
-            Parsimmon.regex(/[a-z0-9\-\!\?\&][a-z0-9\-\!\?\&\.]*/i)
+            Parsimmon.regex(/[^=\{\}\-\.\[\]\:\,][^"\{\}\[\]\:\,]*/)
+            // Parsimmon.regex(/[a-z0-9\-\!\?\&][a-z0-9\-\!\?\&\.]*/i)
         ),
     Operand: (r) =>
         Parsimmon.alt(
@@ -140,15 +140,15 @@ export const Lang = Parsimmon.createLanguage<Grammar>({
                         Parsimmon.string(":"),
                         Parsimmon.alt(r.Number, r.String, r.Array).map(i => i as number | string | number[]),
                     ).many().map((i) => {
-                        let res: ObjectLiteral = {}
+                        const res: ObjectLiteral = {}
                         for (const item of i)
                             if (!res.hasOwnProperty(item[1]))
                                 res[item[1]] = item[3]
                         return res
                     })
                 ).times(0, 1).map((i) => {
-                    if (i.length == 0) return {}
-                    let res: ObjectLiteral = {}
+                    if (i.length === 0) return {}
+                    const res: ObjectLiteral = {}
                     res[i[0][0]] = i[0][2]
                     for (const prop in i[0][3])
                         if (!res.hasOwnProperty(prop))

@@ -34,8 +34,8 @@ export function literalToString(value: Literal): string {
 }
 
 export function objectOperandToString(value: ObjectLiteral) {
-    let keys: string[] = Object.keys(value)
-    if (keys.length == 0) return "{}"
+    const keys: string[] = Object.keys(value)
+    if (keys.length === 0) return "{}"
 
     let result: string = "{"
     for (let i = 0; i < keys.length; i++) {
@@ -48,8 +48,8 @@ export function objectOperandToString(value: ObjectLiteral) {
 }
 
 function objectLiteralToString(value: ObjectLiteral) {
-    let keys: string[] = Object.keys(value)
-    if (keys.length == 0) return "{}"
+    const keys: string[] = Object.keys(value)
+    if (keys.length === 0) return "{}"
 
     let result: string = "{"
     for (let i = 0; i < keys.length; i++) {
