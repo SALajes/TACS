@@ -12,7 +12,11 @@ export default class SubstrCell extends OperationCell {
         const values : Literal[] = this.operandsValueExtraction()
         if(!this.validNumArgs(values.length)) return "!Wrong Number of Arguments!"
 
-        if (typeof values[0] === "string" && typeof values[1] === "number"){
+        if (typeof values[0] === "string" && typeof values[1] === "number") {
+            if (!Number.isInteger(values[1]) || (values[2] !== undefined && !Number.isInteger(values[2]))) {
+                this.hasException = true
+                return "!The index(es) must be integer(s)!"
+            }
             const endIndex : number = values.length === 3 && typeof values[2] === "number" ? values[2] : undefined
 
             if(values[1] >= 1 && values[1] <= values[0].length

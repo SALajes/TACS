@@ -8,9 +8,10 @@ import LenCell from "../cells/formulas/operations/LenCell"
 import MulCell from "../cells/formulas/operations/MulCell"
 import SubCell from "../cells/formulas/operations/SubCell"
 import SumCell from "../cells/formulas/operations/SumCell"
-import Reference from "./Reference"
 import ConcatCell from "../cells/formulas/operations/ConcatCell"
 import SubstrCell from "../cells/formulas/operations/SubstrCell"
+import AvrgCell from "../cells/formulas/operations/AvrgCell"
+import Reference from "./Reference"
 
 export type ObjectLiteral = Record<string, number | string | number[]>
 export type ReferenceString = [string, string]
@@ -75,5 +76,6 @@ export const Operations = {
     'MAX': MaxCell,
     'MIN': MinCell,
     'ARRAY': ArrayOpCell,
-    'CONCAT': ConcatCell
+    'CONCAT': ConcatCell,
+    'AVRG': AvrgCell
 }
